@@ -1,5 +1,7 @@
-from apps.base.models import AddressBase, Base
 from django.db import models
+
+
+from apps.base.models import AddressBase, Base
 
 
 class EventTypeModel(models.Model):
@@ -28,7 +30,23 @@ class EventModel(Base, AddressBase):
     image = models.URLField()
     advertsing = models.URLField()
     status = models.BooleanField(default=False)
-    commission = models.IntegerField(blank=True, null=True)
+    commission = models.IntegerField(blank=True, null=True, default=0)
+    investment = models.DecimalField(
+        max_digits=12, decimal_places=2, blank=True, null=True)
 
     def __str__(self):
         return self.description
+
+
+class EventAnalitc(models.Model):
+    event = models.OneToOneField(
+        EventModel, on_delete=models.DO_NOTHING, related_name='analitics')
+    investment = models.DecimalField(
+        max_digits=12, decimal_places=2, blank=True, null=True, default=0)
+    billing = models.DecimalField(
+        max_digits=12, decimal_places=2, blank=True, null=True, default=0)
+    profit = models.DecimalField(
+        max_digits=12, decimal_places=2, blank=True, null=True, default=0)
+
+    def __str__(self):
+        return self.event.description

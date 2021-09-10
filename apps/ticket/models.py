@@ -1,7 +1,9 @@
+
+from django.db.models.fields import DecimalField
 from apps.wallet.models import Wallet
 from django.db import models
 from apps.base.models import Base
-from apps.events.models import EventModel
+from apps.events.models import EventAnalitc, EventModel
 from django.contrib.auth.models import User
 from django.db.models.signals import post_save
 
@@ -83,6 +85,7 @@ def sale_ticket(sender, instance, *args, **kwargs):
     event = sale.event
     amount = sale.amount
     wallet = sale.wallet
+
     list = TicketSale.objects.filter(
         event=event, wallet=wallet, ticket_type=ticket_type)
     if len(list) == 0:
@@ -104,5 +107,28 @@ def sale_ticket(sender, instance, *args, **kwargs):
 
 post_save.connect(
     receiver=sale_ticket,
+    sender=SaleT
+)
+
+
+def change_analitic_ticket(sender, instance, *args, **kwargs):
+    sale = instance
+    event = sale.event
+    billing = sale.amount
+    list = EventAnalitc.objects.filter(
+        event=event)
+    if len(list) == 0:
+        EventAnalitc.objects.create(
+            event=event,
+            billing=billing
+        )
+    else:
+        obj = list[0]
+        obj.billing += billing
+        obj.save()
+
+
+post_save.connect(
+    receiver=change_analitic_ticket,
     sender=SaleT
 )

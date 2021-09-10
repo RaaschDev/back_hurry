@@ -1,6 +1,7 @@
 from django.db import models
-from apps.events.models import EventModel
+from apps.events.models import EventAnalitc, EventModel
 from apps.base.models import BankData, Base
+from django.db.models.signals import post_save
 
 
 class Vendor(Base, BankData):
@@ -21,3 +22,26 @@ class Vendor(Base, BankData):
 
     def __str__(self):
         return self.description
+
+
+def change_analitic_vendor(sender, instance, *args, **kwargs):
+    vendor = instance
+    event = vendor.event
+    investment = vendor.amount
+    list = EventAnalitc.objects.filter(
+        event=event)
+    if len(list) == 0:
+        EventAnalitc.objects.create(
+            event=event,
+            investment=investment
+        )
+    else:
+        obj = list[0]
+        obj.investment += investment
+        obj.save()
+
+
+post_save.connect(
+    receiver=change_analitic_vendor,
+    sender=Vendor
+)

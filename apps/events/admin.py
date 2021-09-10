@@ -1,10 +1,18 @@
 from django.contrib import admin
-from .models import Category, EventModel, EventTypeModel
+from .models import Category, EventModel, EventTypeModel, EventAnalitc
 from apps.consumable.models import Consumable
 from apps.ticket.models import TicketModel
 
 admin.site.register(Category)
 admin.site.register(EventTypeModel)
+
+
+class EventAnalitcInline(admin.TabularInline):
+    model = EventAnalitc
+    fields = ('event', 'investment',
+              'billing', 'profit')
+    readonly_fields = ('event', 'investment',
+                       'billing', 'profit')
 
 
 class ConsumableInline(admin.TabularInline):
@@ -26,6 +34,7 @@ class EventModelAdmin(admin.ModelAdmin):
     inlines = [
         ConsumableInline,
         TicketInline,
+        EventAnalitcInline
     ]
     list_display = ('id', 'description', 'date',
                     'start', 'event_type', 'category', 'status')
